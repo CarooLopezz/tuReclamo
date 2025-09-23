@@ -14,6 +14,8 @@ db.init_app(app)
  #Registrar rutas
 app.register_blueprint(director_sector)
 app.register_blueprint(user_type_bp)
+app.register_blueprint()
+app.register_blueprint(user_type_bp)
 
 
 if __name__ == '__main__':
