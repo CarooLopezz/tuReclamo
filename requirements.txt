@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 blinker==1.9.0
 cffi==1.17.1
 click==8.1.8
@@ -14,6 +15,8 @@ python-dotenv==1.1.0
 SQLAlchemy==2.0.40
 typing_extensions==4.13.2
 Werkzeug==3.1.3
+=======
+>>>>>>> f889f2900052ea39049e495361eaef2bbac62257
 annotated-types==0.7.0
 anyio==4.10.0
 click==8.2.1

@@ -3,18 +3,24 @@ from .db import db  # import relativo al mismo nivel
 class DirectorSector(db.Model):
     __tablename__ = "director_sector"
 
-    
-    id_director = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    
+    id_reclamo = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    descripcion = db.Column(db.String(255), nullable=False)
+    fecha_creacion = db.Column(db.Date, nullable=False)
+    estado = db.Column(db.String(50), nullable=False)
+    ubicacion = db.Column(db.String(100), nullable=False)
 
-    id_usuario = db.Column(db.Integer, db.ForeignKey("usuario.id_usuario"), nullable=False)
-    user = db.relationship("User")
+    id_vecino = db.Column(db.Integer, db.ForeignKey("vecino.id_vecino"))
+    id_administrador = db.Column(db.Integer, db.ForeignKey("administrador.id_administrador"))
+    id_sector = db.Column(db.Integer, db.ForeignKey("sector.id_sector"))
 
-    # Reclamos que supervisa
-    """ id_reclamo = db.Column(db.Integer, db.ForeignKey("reclamo.id_reclamo"), nullable=False)
-    reclamo = db.relationship("Reclamo") """
-
-    
-
-    def __repr__(self):
-        return f"<DirectorSector {self.id_director} - Usuario {self.id_usuario}>"
+    def serialize(self):
+        return {
+            "id_reclamo": self.id_reclamo,
+            "descripcion": self.descripcion,
+            "fecha_creacion": self.fecha_creacion,
+            "estado": self.estado,
+            "ubicacion": self.ubicacion,
+            "id_vecino": self.id_vecino,
+            "id_administrador": self.id_administrador,
+            "id_sector": self.id_sector
+        }

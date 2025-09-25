@@ -1,9 +1,8 @@
 from flask import Blueprint, request, jsonify
-from backend.models.userTypemodels import UserType
+from backend.models.UserTypemodels import UserType
 from backend.models.db import db
 
 user_type_bp = Blueprint('user_type', __name__, url_prefix='/user_type')
-
 # GET: Listar todos
 @user_type_bp.route('/', methods=['GET'])
 def get_user_types():
