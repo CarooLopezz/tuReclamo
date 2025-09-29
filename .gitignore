@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+.pyc
+__pycache__/
+=======
 # Entorno virtual
 venv/
 
@@ -16,3 +20,4 @@ __pycache__/
 # Configuración de IDE/editores
 .vscode/
 .idea/
+>>>>>>> f889f2900052ea39049e495361eaef2bbac62257
