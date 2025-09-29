@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models.reclamo import Reclamo
+from ..models.reclamo import Reclamo
 
 # Prefijo para todas las rutas de reclamos
 reclamo_bp = Blueprint('reclamo_bp', __name__, url_prefix='/reclamos')
@@ -36,3 +36,14 @@ def cambiar_estado(id):
     reclamo = Reclamo(id_reclamo=id)
     reclamo.cambiar_estado(nuevo_estado)
     return jsonify({'mensaje': 'Estado actualizado'}), 200
+
+
+@reclamo_bp.route('/<int:id>', methods=['DELETE'])
+def eliminar_reclamo(id):
+    reclamo = Reclamo(id_reclamo=id)
+    
+    if not reclamo:
+        return jsonify({'error': 'Reclamo no encontrado'}), 404
+
+    reclamo.eliminar()
+    return jsonify({'mensaje': f'Reclamo {id} eliminado'}), 200
