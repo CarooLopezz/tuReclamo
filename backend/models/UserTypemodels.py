@@ -7,8 +7,7 @@ class UserType(db.Model):
 
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     tipo = db.Column(db.String(50), nullable=False, unique=True)  # 'vecino', 'director', 'admin'
-    director_sector_id = db.Column(db.String(36), db.ForeignKey("director_sector.id"), nullable=True)
-
+    director_sector = db.relationship("DirectorSector", back_populates="user_types")
     # Relaciones
     users = db.relationship("User", back_populates="user_type", cascade="all, delete-orphan")
     director_sector = db.relationship("DirectorSector", back_populates="user_type")
