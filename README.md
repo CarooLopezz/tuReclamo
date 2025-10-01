@@ -1,121 +1,153 @@
-TuReclamo es una app que busca agilizar un reclamo de ciudadano ante un municipio de Mendoza.
-Integrantes:
-Adriana Antunez
-Iara Fernandez
-Lara Magallanes
-Carolina Lopez
+# 🌟 TuReclamo - App de Gestión de Reclamos Ciudadanos
 
-Entidades principales (mínimo 3)
+![banner](https://img.shields.io/badge/Proyecto-TuReclamo-blue?style=for-the-badge\&logo=flask)
+![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge\&logo=python)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?style=for-the-badge\&logo=mysql)
+![Flask](https://img.shields.io/badge/Flask-RESTful-orange?style=for-the-badge\&logo=flask)
 
-USUARIO
+---
 
-    PK: id_usuario
+## ✨ Descripción del Proyecto
 
-    Atributos: nombre, apellido, DNI, correo, direccion, tipo_usuario (puede ser vecino o administrador)
+**TuReclamo** es una aplicación pensada para **agilizar los reclamos de los ciudadanos ante el municipio de Mendoza**, mejorando la comunicación, la transparencia y la eficiencia en la resolución de problemas urbanos. 🚀🏙️
 
-RECLAMO 
+La plataforma permite:
 
-    PK: id_reclamo
+* Reportar problemas como árboles caídos, cortes de luz, baches y residuos 🌳💡🛣️🗑️
+* Hacer seguimiento en tiempo real de cada reclamo 🔄
+* Facilitar la comunicación entre vecinos y autoridades municipales 🤝
 
-    Atributos: descripcion, fecha_creacion, estado, ubicacion
+---
 
-FK:
+## 👩‍💻 Integrantes del Equipo
 
-     id_vecino → referencia a Usuario (cuando es tipo "vecino")
+| Integrante          | Especialidad / Contribución      |
+| ------------------- | -------------------------------- |
+| **Iara Fernandez**  | Full Stack / Creatividad 💡      |
+| **Carolina Lopez**  | Full Stack / Diseño UI 🎨        |
+| **Lara Magallanes** | Full Stack / Base de datos 🗄️   |
+| **Adriana Antunez** | Full Stack / Coordinación & QA ✅ |
 
-     id_administrador → referencia a Usuario (cuando es tipo "administrador")
+> Trabajando juntas para crear un puente entre vecinos y autoridades 💪✨
 
-     id_sector → referencia a Sector
+---
 
-SECTOR (o DirectorSector)
+## 🏛️ Entidades Principales
 
-     PK: id_sector
+### 1️⃣ Usuario
 
-    Atributos: nombre_sector, descripcion
+* **PK:** `id_usuario`
+* **Atributos:** `nombre, apellido, DNI, correo, direccion, tipo_usuario (vecino o administrador)`
 
-    Relación: un sector puede tener reclamos asociados y un director responsable.
+### 2️⃣ Reclamo
 
+* **PK:** `id_reclamo`
+* **Atributos:** `descripcion, fecha_creacion, estado, ubicacion`
+* **FK:**
+
+  * `id_vecino` → referencia a Usuario (vecino)
+  * `id_administrador` → referencia a Usuario (administrador)
+  * `id_sector` → referencia a Sector
+
+### 3️⃣ Sector (DirectorSector)
+
+* **PK:** `id_sector`
+* **Atributos:** `nombre_sector, descripcion`
+* **Relación:** Un sector puede tener varios reclamos y un director responsable.
+
+---
+
+## 📊 Diagrama de Relaciones
 
 ![Diagrama de Reclamos](IMAGEN/captura.png)
 
+---
 
-TuReclamo es una app que busca agilizar un reclamo de ciudadano ante un municipio de Mendoza.
-Integrantes:
-Adriana Antunez
-Iara Fernandez
-Lara Magallanes
-Carolina Lopez
+## ⚡ Características del Proyecto
 
+* CRUD completo para **usuarios, reclamos y sectores** ✅
+* API RESTful con **Flask + SQLAlchemy + MySQL** 🔥
+* **Frontend básico con Bootstrap** para mostrar listados y formularios 💻
+* Gestión de migraciones con **Flask-Migrate** 🔄
+* Uso de **variables de entorno** para configuración segura 🌱
 
-# Flask API RESTful CRUD
+---
 
-Este es un proyecto que consiste en una aplicación CRUD usando Flask, SQLAlchemy y MySQL.
+## 🛠 Requisitos
 
-## Requisitos
+* Python 3.x 🐍
+* MySQL 🗄️
+* Pip (`pip install`)
 
-- Python 3
-- MySQL
+---
 
-## Configuración del entorno
+## 🌱 Configuración del Entorno
 
-### 1. Crear un entorno virtual
+### 1️⃣ Crear un entorno virtual
 
-#### En Linux / macOS:
-```sh
+**Linux / macOS:**
+
+```bash
 python3 -m venv <nombre_del_entorno>
 ```
 
-#### En Windows:
-```sh
+**Windows:**
+
+```bash
 python -m venv <nombre_del_entorno>
 ```
 
-### 2. Activar el entorno virtual
+### 2️⃣ Activar el entorno virtual
 
-#### En Linux / macOS:
-```sh
+**Linux / macOS:**
+
+```bash
 source <nombre_del_entorno>/bin/activate
 ```
 
-#### En Windows:
-```sh
+**Windows:**
+
+```bash
 <nombre_del_entorno>\Scripts\activate
 ```
 
-### 3. Instalar dependencias
+### 3️⃣ Instalar dependencias
 
-```sh
-pip install Flask Flask-SQLAlchemy PyMySQL python-dotenv
+```bash
+pip install -r requirements.txt
 ```
 
-## Configuración de la base de datos
+---
 
-Antes de ejecutar la aplicación, debes configurar las siguientes variables de entorno:
+## 🗄️ Configuración de la Base de Datos
 
-```sh
+Crear un archivo `.env` con tus credenciales:
+
+```env
 MYSQL_USER=<tu_usuario>
 MYSQL_PASSWORD=<tu_contraseña>
 MYSQL_DATABASE=<nombre_de_la_base_de_datos>
 MYSQL_HOST=<host_de_mysql>
 ```
 
-## Instalación y ejecución
+---
+
+## 🚀 Instalación y Ejecución
 
 1. Clona el repositorio:
-```sh
+
+```bash
 git clone <url_del_repositorio>
 ```
 
 2. Accede al directorio del proyecto:
-```sh
+
+```bash
 cd <nombre_del_proyecto>
 ```
 
-3. Instala las dependencias desde el archivo `requirements.txt`:
-```sh
-pip install -r requirements.txt
-```
+3. Ejecuta la aplicación:
 
-4. Ejecuta la aplicación:
-```sh
+```bash
 python app.py
+```
