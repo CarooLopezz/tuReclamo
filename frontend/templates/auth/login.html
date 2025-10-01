@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+<img src="{{ url_for('static', filename='images/tureclamo.png') }}" alt="Tu Reclamo" class="logo-reclamo">
+
+<div class="d-flex justify-content-center align-items-center vh-100" >
+
+  <div class="card shadow p-4" style="max-width: 400px; width: 100% ;border:2px solid #ff4d4d" >
+     
+        <h2 class="text-center mb-4">Iniciar Sesión</h2>
+        
+        <form method="POST">
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input 
+            type="email" 
+            class="form-control" 
+            id="email" 
+            name="email" 
+            required
+            >
+           
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <input 
+          type="password" 
+          class="form-control" 
+          id="password" 
+          name="password" 
+          required
+        >
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">
+        Iniciar Sesión
+      </button>
+    </form>
+
+    <p class="text-center mt-3">
+      ¿No tenés cuenta? 
+      <a href="{{ url_for('auth.register') }}" style="color: #ff4d4d">Registrarse</a>
+    </p>
+     </div>
+ 
+</div>
+{% endblock %}
+
+
+<!-- # testing
+detectar errores
+asegurar la calidad validar
+mejoras
+refactorizar
+seguridad
+aaa tdd 
+excalidraw
+manuales y automáticas
+caja blanca y caja negra
+caja blanca: estudio los datos los analizo para que tenagn ciertos resultados
+caja negra:conozco el código
+la prueba de estress es saturar tu aplicacion aunque reviente
+ataque de fuerza bruta .. hacking etico
+puede haber ataques sencillos a tu pagina haseho de contraseña token evita esos ataques.
+-- herramientas de google que nos avisa el rendimiento de tu app
+automatico: unit test
+test de integracion
+end-to-end  verifica parte grande de la aplicacion. Ej:cuantos clics debe realizar el usuario para realizar un tareas.
+
+arbol de decisiones:
+app main
+curso 
+materia
+inscripción
+ en vez de eso que pase de app main a inscripcion 
+ unit test probar solamente una función
+ integration test testeo todo un módulo de la aplicación.
+ typescrit detecta los errores antes del deploy
+ iso 9000
+ buenas practicas
+ nombre
+ mockear simular datos por ej los datos que viene de la bd
+ ver los resultados
+ coverange-- porcentaje de lineas que se ejecutan en un test
+ pip install pytest
+ probarlo para el test sin levantar la aplicacion
+flask documentation -->
