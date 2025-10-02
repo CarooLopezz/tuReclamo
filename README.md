@@ -59,7 +59,7 @@ La plataforma permite:
 
 ## 📊 Diagrama de Relaciones
 
-![Diagrama de Reclamos](images/captura.png)
+![Diagrama de Reclamos](frontend/static/images/captura.png)
 
 ---
 
