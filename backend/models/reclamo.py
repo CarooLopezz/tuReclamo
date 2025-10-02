@@ -12,12 +12,22 @@ class Reclamo(db.Model):
     foto = db.Column(db.String(255), nullable=True)
 
     # Foreign Keys
-    vecino_id = db.Column(db.String(36), db.ForeignKey("user.id"), nullable=False)
     director_sector_id = db.Column(db.String(36), db.ForeignKey("director_sector.id"), nullable=True)
-
+    user_id = db.Column(db.String(36), db.ForeignKey("user.id"), nullable=False) 
+    user = db.relationship("User", back_populates="reclamos")
     # Relaciones
-    vecino = db.relationship("User", back_populates="reclamos")
+   
     director_sector = db.relationship("DirectorSector", back_populates="reclamos")
+    def serialize(self):
+        return {
+            "id": self.id,
+            "descripcion": self.descripcion,
+            "estado": self.estado,
+            "fecha_creacion": self.fecha_creacion.isoformat(),
+            "foto": self.foto,
+            "director_sector_id": self.director_sector_id,
+            "user_id": self.user_id
+        }
 
     def __repr__(self):
         return f"<Reclamo {self.id} - {self.descripcion[:30]}...>"

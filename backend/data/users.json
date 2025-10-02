@@ -1,23 +1,10 @@
 [
   {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
-    "username": "admin_master",
-    "email": "admin@example.com",
-    "password": "pbkdf2:sha256:260000$hashAdmin123",
-    "role": "admin",
-    "user_type_id": "11111111-1111-1111-1111-111111111111",
-    "user_type": {
-      "id": "11111111-1111-1111-1111-111111111111",
-      "tipo": "Administrador"
-    }
-  },
-  {
     "id": "660e8400-e29b-41d4-a716-446655440000",
     "username": "vecino_juan",
     "email": "juan.vecino@example.com",
     "password": "pbkdf2:sha256:260000$hashVecino123",
     "role": "user",
-    "user_type_id": "22222222-2222-2222-2222-222222222222",
     "user_type": {
       "id": "22222222-2222-2222-2222-222222222222",
       "tipo": "Vecino"
@@ -29,7 +16,6 @@
     "email": "ana.directora@example.com",
     "password": "pbkdf2:sha256:260000$hashDirector123",
     "role": "director",
-    "user_type_id": "33333333-3333-3333-3333-333333333333",
     "user_type": {
       "id": "33333333-3333-3333-3333-333333333333",
       "tipo": "Directora de Sector"
@@ -41,7 +27,17 @@
     "email": "caro@example.com",
     "password": "pbkdf2:sha256:260000$hashUser123",
     "role": "user",
-    "user_type_id": "22222222-2222-2222-2222-222222222222",
+    "user_type": {
+      "id": "22222222-2222-2222-2222-222222222222",
+      "tipo": "Vecino"
+    }
+  },
+  {
+    "id": "990e8400-e29b-41d4-a716-446655440000",
+    "username": "vecina_maria",
+    "email": "maria.vecina@example.com",
+    "password": "pbkdf2:sha256:260000$hashMariaVecina",
+    "role": "user",
     "user_type": {
       "id": "22222222-2222-2222-2222-222222222222",
       "tipo": "Vecino"

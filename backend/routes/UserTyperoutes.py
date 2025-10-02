@@ -11,7 +11,7 @@ def get_user_types():
         "id": t.id,
         "id_usuario": t.id_usuario,
         "tipo": t.tipo,
-        "directorSecto_id": t.directorSecto_id
+        "directorSector_id": t.directorSector_id
     } for t in types]), 200
 
 # POST: Crear nuevo UserType
@@ -21,7 +21,7 @@ def create_user_type():
     nuevo = UserType(
         id_usuario=data['id_usuario'],
         tipo=data['tipo'],
-        directorSecto_id=data.get('directorSecto_id')
+        directorSector_id=data.get('directorSector_id')
     )
     db.session.add(nuevo)
     db.session.commit()

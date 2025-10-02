@@ -1,0 +1,47 @@
+[
+  {
+    "id": "a10e8400-e29b-41d4-a716-446655440000",
+    "descripcion": "El contenedor de basura en la esquina está desbordado hace días.",
+    "estado": "pendiente",
+    "fecha_creacion": "2025-10-01T10:15:00",
+    "foto": "https://example.com/uploads/reclamos/basura.jpg",
+    "director_sector_id": "770e8400-e29b-41d4-a716-446655440000",
+    "user_id": "660e8400-e29b-41d4-a716-446655440000"
+  },
+  {
+    "id": "b20e8400-e29b-41d4-a716-446655440000",
+    "descripcion": "Farol de la calle no funciona desde hace una semana.",
+    "estado": "en progreso",
+    "fecha_creacion": "2025-09-28T22:00:00",
+    "foto": "https://example.com/uploads/reclamos/farol.jpg",
+    "director_sector_id": "770e8400-e29b-41d4-a716-446655440000",
+    "user_id": "880e8400-e29b-41d4-a716-446655440000"
+  },
+  {
+    "id": "c30e8400-e29b-41d4-a716-446655440000",
+    "descripcion": "Hay un pozo muy profundo en la calle San Martín al 500.",
+    "estado": "resuelto",
+    "fecha_creacion": "2025-09-15T09:30:00",
+    "foto": "https://example.com/uploads/reclamos/pozo.jpg",
+    "director_sector_id": "770e8400-e29b-41d4-a716-446655440000",
+    "user_id": "990e8400-e29b-41d4-a716-446655440000"
+  },
+  {
+    "id": "d40e8400-e29b-41d4-a716-446655440000",
+    "descripcion": "El semáforo de la avenida principal parpadea y no regula el tránsito.",
+    "estado": "pendiente",
+    "fecha_creacion": "2025-10-01T08:00:00",
+    "foto": null,
+    "director_sector_id": "770e8400-e29b-41d4-a716-446655440000",
+    "user_id": "660e8400-e29b-41d4-a716-446655440000"
+  },
+  {
+    "id": "e50e8400-e29b-41d4-a716-446655440000",
+    "descripcion": "El parque infantil tiene juegos rotos y oxidados.",
+    "estado": "en progreso",
+    "fecha_creacion": "2025-09-20T16:45:00",
+    "foto": "https://example.com/uploads/reclamos/parque.jpg",
+    "director_sector_id": "770e8400-e29b-41d4-a716-446655440000",
+    "user_id": "880e8400-e29b-41d4-a716-446655440000"
+  }
+]

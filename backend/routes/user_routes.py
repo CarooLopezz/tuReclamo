@@ -1,58 +1,70 @@
 import os
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash,jsonify
 from backend.models.db import db
 from backend.models.user import User
+from backend.models.UserTypemodels import UserType
 
-users = Blueprint('user', __name__, url_prefix="/users")
+users = Blueprint('user', __name__)
 
 # -------- LISTADO DE USUARIOS --------
-@users.route('/', methods=['GET'])
+@users.route("/", methods=["GET"])
 def listar_usuarios():
-    users_list = User.query.all()
-    return render_template('users/listar.html', users=users_list)
+    usuarios = User.query.all()
+    return jsonify([u.serialize() for u in usuarios])
 
+#---------- CREAR USUARIO -----------
 
-# -------- CREAR USUARIO --------
-@users.route('/create', methods=['GET', 'POST'])
+@users.route('/create', methods=['POST'])
 def crear_usuario():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        role = request.form['role']
+    data = request.get_json()
 
-        nuevo_usuario = User(
-            username=username,
-            email=email,
-            role=role
-        )
-        db.session.add(nuevo_usuario)
-        db.session.commit()
+    username = data.get('username')
+    email = data.get('email')
+    role = data.get('role')
+    password = data.get('password')
+    user_type = data.get('user_type')  # objeto embebido
 
-        flash("Usuario creado correctamente", "success")
-        return redirect(url_for('user.listar_usuarios'))
+    # Sacar el id de user_type si viene embebido
+    user_type_id = None
+    if user_type and isinstance(user_type, dict):
+        user_type_id = user_type.get('id')
 
-    return render_template('users/create.html')
+    if not username or not email or not role or not user_type_id or not password:
+        return jsonify({"error": "Faltan datos obligatorios"}), 400
+
+    # Asumiendo que la password ya viene hasheada en este caso
+    nuevo_usuario = User(
+        username=username,
+        email=email,
+        password=password,
+        role=role,
+        user_type_id=user_type_id
+    )
+    db.session.add(nuevo_usuario)
+    db.session.commit()
+
+    return jsonify(nuevo_usuario.serialize()), 201
+
 
 
 # -------- EDITAR USUARIO --------
-@users.route('/<int:id>/edit', methods=['GET', 'POST'])
+
+@users.route('/<string:id>/edit', methods=['PUT'])
 def editar_usuario(id):
     usuario = User.query.get_or_404(id)
+    data = request.get_json()
 
-    if request.method == 'POST':
-        usuario.username = request.form['username']
-        usuario.email = request.form['email']
-        usuario.role = request.form['role']
+    usuario.username = data.get('username', usuario.username)
+    usuario.email = data.get('email', usuario.email)
+    usuario.role = data.get('role', usuario.role)
+    usuario.user_type_id = data.get('user_type_id', usuario.user_type_id)
 
-        db.session.commit()
-        flash("Usuario actualizado correctamente", "success")
-        return redirect(url_for('user.listar_usuarios'))
-
-    return render_template('users/edit.html', usuario=usuario)
+    db.session.commit()
+    return jsonify(usuario.serialize()), 200
 
 
 # -------- ELIMINAR USUARIO --------
-@users.route('/<int:id>/delete', methods=['POST'])
+@users.route('/<string:id>/delete', methods=['DELETE'])
 def eliminar_usuario(id):
     usuario = User.query.get_or_404(id)
     db.session.delete(usuario)

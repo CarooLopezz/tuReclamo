@@ -1,6 +1,5 @@
 # backend/models/user.py
 import uuid
-from werkzeug.security import generate_password_hash, check_password_hash
 from backend.models.db import db
 
 class User(db.Model):
@@ -15,12 +14,18 @@ class User(db.Model):
     # Relación con UserType
     user_type_id = db.Column(db.String(36), db.ForeignKey("user_type.id"), nullable=False)
     user_type = db.relationship("UserType", back_populates="users")
+    reclamos = db.relationship("Reclamo", back_populates="user")
 
-    def set_password(self, password):
-        self.password = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
-
-    def __repr__(self):
-        return f"<User {self.id} - {self.username} ({self.user_type.tipo if self.user_type else 'Sin tipo'})>"
+    
+    
+    def serialize(self):
+            return {
+                "id": self.id,
+                "username": self.username,
+                "email": self.email,
+                "role": self.role,
+                "user_type": {
+                    "id": self.user_type.id if self.user_type else None,
+                    "tipo": self.user_type.tipo if self.user_type else None
+            }
+        }

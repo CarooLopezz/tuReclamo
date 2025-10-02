@@ -10,7 +10,7 @@ class UserType(db.Model):
     director_sector_id = db.Column(db.String(36), db.ForeignKey("director_sector.id"), nullable=True)
 
     # Relaciones
-    users = db.relationship("User", back_populates="user_type", cascade="all, delete-orphan")
+    users = db.relationship("User", back_populates="user_type")
     director_sector = db.relationship("DirectorSector", back_populates="user_type")
 
     def __repr__(self):

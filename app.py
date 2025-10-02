@@ -19,6 +19,7 @@ app.register_blueprint(reclamo_bp)
 app.register_blueprint(director_sector)
 app.register_blueprint(auth_bp)
 
+
 app.config["SQLALCHEMY_DATABASE_URI"]= DATABASE_CONNECTION_URI
 app.config["TEMPLATES_AUTO_RELOAD"] = True  
 app.secret_key = 'clave-repiola'
@@ -26,6 +27,7 @@ app.secret_key = 'clave-repiola'
 db.init_app(app)
 migrate = Migrate(app, db)
 with app.app_context():
+    print(User.query.all())
     from backend.models.user import User
     from backend.models.UserTypemodels import UserType
     from backend.models.reclamo import Reclamo
