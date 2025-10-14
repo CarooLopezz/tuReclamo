@@ -1,4 +1,5 @@
 import os
+import jwt
 from flask import Flask, render_template
 from backend.config.config import DATABASE_CONNECTION_URI
 from backend.models.db import db
@@ -34,8 +35,8 @@ db_name = os.getenv("MYSQL_DB")
 
 
 app.register_blueprint(users)
-app.register_blueprint(user_type_bp)
 app.register_blueprint(reclamo_bp)
+app.register_blueprint(user_type_bp)
 app.register_blueprint(director_sector)
 app.register_blueprint(auth_bp)
 
@@ -44,12 +45,10 @@ with app.app_context():
 
     print(User.query.all())
     from backend.models.user import User
-    from backend.models.UserTypemodels import UserType
     from backend.models.reclamo import Reclamo
+    from backend.models.UserTypemodels import UserType
     from backend.models.director_sector import DirectorSector
     
-
-
 
     db.create_all()
     

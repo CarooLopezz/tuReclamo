@@ -7,8 +7,10 @@ class DirectorSector(db.Model):
     name = db.Column(db.String(100), nullable=False)
 
     # Relaciones
-    user_type = db.relationship("UserType", back_populates="director_sector")
     reclamos = db.relationship("Reclamo", back_populates="director_sector")
+    user_type_id = db.Column(db.String(36), db.ForeignKey("user_type.id"))
+
+    user_type = db.relationship("UserType", back_populates="director_sector")
 
     def __repr__(self):
         return f"<DirectorSector {self.id} - {self.name}>"
