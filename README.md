@@ -21,7 +21,7 @@ La plataforma permite:
 
 ## 👩‍💻 Integrantes del Equipo
 
-| Integrante          |
+| Integrantes          |
 | ------------------- | 
 | **Iara Fernandez**  |
 | **Carolina Lopez**  | 
