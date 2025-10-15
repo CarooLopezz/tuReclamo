@@ -21,12 +21,12 @@ La plataforma permite:
 
 ## 👩‍💻 Integrantes del Equipo
 
-| Integrante          | Especialidad / Contribución      |
-| ------------------- | -------------------------------- |
-| **Iara Fernandez**  | Full Stack / Creatividad 💡      |
-| **Carolina Lopez**  | Full Stack / Diseño UI 🎨        |
-| **Lara Magallanes** | Full Stack / Base de datos 🗄️   |
-| **Adriana Antunez** | Full Stack / Coordinación & QA ✅ |
+| Integrante          |
+| ------------------- | 
+| **Iara Fernandez**  |
+| **Carolina Lopez**  | 
+| **Lara Magallanes** | 
+| **Adriana Antunez** | 
 
 > Trabajando juntas para crear un puente entre vecinos y autoridades 💪✨
 
