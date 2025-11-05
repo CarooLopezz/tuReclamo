@@ -13,15 +13,16 @@ from backend.routes.reclamo_routes import reclamo_bp
 from backend.routes.director_sector import director_sector
 from backend.routes.auth_routes import auth_bp
 from flask_migrate import Migrate
+from werkzeug.security import generate_password_hash
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 load_dotenv()  # carga las variables del .env
 
-app = Flask(__name__, template_folder='frontend/templates', static_folder="frontend/static" )
-
-
-app.config["SQLALCHEMY_DATABASE_URI"]= DATABASE_CONNECTION_URI
-app.config["TEMPLATES_AUTO_RELOAD"] = True  
+app = Flask(__name__, template_folder='frontend/templates', static_folder="frontend/static")
+CORS(app, supports_credentials=True)
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_CONNECTION_URI
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.secret_key = 'clave-repiola'
 
 db.init_app(app)
@@ -33,25 +34,43 @@ db_password = os.getenv("MYSQL_PASSWORD")
 db_host = os.getenv("MYSQL_HOST")
 db_name = os.getenv("MYSQL_DB")
 
-
 app.register_blueprint(users)
 app.register_blueprint(reclamo_bp)
 app.register_blueprint(user_type_bp)
 app.register_blueprint(director_sector)
 app.register_blueprint(auth_bp)
 
-
 with app.app_context():
-
-    print(User.query.all())
-    from backend.models.user import User
-    from backend.models.reclamo import Reclamo
-    from backend.models.UserTypemodels import UserType
-    from backend.models.director_sector import DirectorSector
-    
-
     db.create_all()
-    
+    print(User.query.all())
+
+    directores_data = [
+        {"username": "director_oeste", "email": "oeste@municipio.com", "password": "1234"},
+        {"username": "director_este", "email": "este@municipio.com", "password": "1234"},
+        {"username": "director_norte", "email": "norte@municipio.com", "password": "1234"},
+        {"username": "director_sur", "email": "sur@municipio.com", "password": "1234"}
+    ]
+
+    director_tipo = UserType.query.filter_by(tipo="director_sector").first()
+    if not director_tipo:
+        print("⚠️ No existe el tipo 'director_sector'. Cargalo primero con init_user_types.py")
+    else:
+        for data in directores_data:
+            if not User.query.filter_by(email=data["email"]).first():
+                hashed_password = generate_password_hash(data["password"])
+                nuevo_director = User(
+                    username=data["username"],
+                    email=data["email"],
+                    password=hashed_password,
+                    user_type_id=director_tipo.id
+                )
+                db.session.add(nuevo_director)
+                print(f"✅ Director {data['username']} agregado")
+
+        db.session.commit()
+        print("✔️ Todos los directores de sector fueron cargados.")
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
-

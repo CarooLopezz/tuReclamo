@@ -1,6 +1,8 @@
 # backend/routes/auth_routes.py
+
 from flask import Blueprint, request, render_template, redirect, url_for, flash, session, jsonify
 from backend.models.user import User
+from backend.models.UserTypemodels import UserType
 from backend.models.db import db
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
@@ -14,12 +16,18 @@ def token_required(role=None):
     def decorator(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            token = request.headers.get("Authorization") or session.get("token")
+            token = None
+
+            if "token" in session:
+                token = session["token"]
+     
+            elif "Authorization" in request.headers:
+                token = request.headers["Authorization"].split()[1]
+
             if not token:
                 return jsonify({"message": "Falta el token"}), 401
+
             try:
-                if " " in token:
-                    token = token.split()[1]  # Bearer <token>
                 data = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
                 current_user = User.query.get(data["id"])
                 if not current_user:
@@ -28,6 +36,7 @@ def token_required(role=None):
                     return jsonify({"message": "No autorizado"}), 403
             except Exception as e:
                 return jsonify({"message": "Token inválido", "error": str(e)}), 401
+
             return f(current_user, *args, **kwargs)
         return decorated
     return decorator
@@ -37,71 +46,82 @@ def token_required(role=None):
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
-        password = request.form.get("password")
+        try:
+            data = request.get_json()
+            print("Datos recibidos:", data)
 
-        if User.query.filter_by(email=email).first():
-            flash("El email ya está registrado", "danger")
-            return redirect(url_for("auth.register"))
+            username = data.get("username")
+            email = data.get("email")
+            password = data.get("password")
 
-        # Encriptar la contraseña antes de guardarla
-        hashed_password = generate_password_hash(password)
+    
+            vecino_tipo = UserType.query.filter_by(tipo="vecino").first()
+            if not vecino_tipo:
+                return jsonify({"error": "El tipo 'vecino' no existe. Cargalo con init_user_types.py"}), 400
 
-        user = User(username=username, email=email, password=hashed_password)
-        db.session.add(user)
-        db.session.commit()
+            hashed_password = generate_password_hash(password)
+            nuevo_user = User(
+                username=username,
+                email=email,
+                password=hashed_password,
+                role="user",
+                user_type_id=vecino_tipo.id
+            )
 
-        flash("Registro exitoso. Inicia sesión.", "success")
-        return redirect(url_for("auth.login"))
-
+            db.session.add(nuevo_user)
+            db.session.commit()
+            return jsonify({"message": "Usuario registrado correctamente"}), 201
+        except Exception as e:
+            print("ERROR EN /register:", e)
+            return jsonify({"error": str(e)}), 500
     return render_template("auth/register.html")
 
 # -------------------- LOGIN --------------------
-@auth_bp.route("/login", methods=["GET", "POST"])
+@auth_bp.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
+        try:
+            data = request.get_json()  
+        except Exception as e:
+            print("Error leyendo JSON:", e)
+            return jsonify({"message": "Error al leer JSON"}), 400
+
+        if not data:
+            return jsonify({"message": "No se recibieron datos"}), 400
+
+        email = data.get("email")
+        password = data.get("password")
 
         user = User.query.filter_by(email=email).first()
         if not user or not check_password_hash(user.password, password):
-            flash("Email o contraseña incorrectos", "danger")
-            return redirect(url_for("auth.login"))
+            return jsonify({"message": "Email o contraseña incorrectos"}), 401
 
-        # 🔑 Crear token JWT
         token = jwt.encode(
-            {
-                "id": user.id,
-                "exp": datetime.utcnow() + timedelta(hours=1)
-            },
+            {"id": user.id, "exp": datetime.utcnow() + timedelta(hours=1)},
             app.config["SECRET_KEY"],
             algorithm="HS256"
         )
+        
 
-        # 🔹 Guardamos el token en sesión si querés usarlo en plantillas
-        session["token"] = token
-
-        flash("Inicio de sesión exitoso", "success")
-        return jsonify({"message": "Login exitoso", "token": token})
+        return jsonify({
+            "message": "Login exitoso",
+            "token": token,
+            "role": user.role,
+            "username": user.username
+        }), 200
 
     return render_template("auth/login.html")
 
-""" 
 # -------------------- DASHBOARD --------------------
-@auth_bp.route("/dashboard")
-@token_required()
-def dashboard(current_user):
-    return render_template("inicio/inicio.html", username=current_user.username, role=current_user.role)
-
-# -------------------- LISTA DE USUARIOS (ADMIN) --------------------
-@auth_bp.route("/users")
-@token_required(role="admin")
-def list_users(current_user):
-    users = User.query.all()
-    users_data = [{"id": u.id, "username": u.username, "email": u.email, "role": u.role} for u in users]
-    return render_template("auth/users.html", users=users_data)
-
+@auth_bp.route("/dashboard") # solo los usuarios autenticados pueden entrar al dashboard
+def dashboard():
+    return render_template("dashboard/dashboard.html")
+""" 
+@dashboard_bp.route("/dashboard")
+@login_required
+def dashboard():
+    reclamos = Reclamo.query.order_by(Reclamo.id.desc()).all()
+    return render_template("dashboard.html", reclamos=reclamos)
 # -------------------- LOGOUT -------------------- cierra sesión
 @auth_bp.route("/logout")
 def logout():

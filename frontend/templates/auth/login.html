@@ -3,6 +3,11 @@
 {% block title %}Login{% endblock %}
 
 {% block body %}
+<style>
+  body {
+    background-color: #d9f1ff; /* Celeste pastel */
+  }
+</style>
 <img src="{{ url_for('static', filename='images/tureclamo.png') }}" alt="Tu Reclamo" class="logo-reclamo">
 
 <div class="d-flex justify-content-center align-items-center vh-100" >
@@ -11,17 +16,16 @@
      
         <h2 class="text-center mb-4">Iniciar Sesión</h2>
         
-        <form method="POST">
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input 
-            type="email" 
-            class="form-control" 
-            id="email" 
-            name="email" 
-            required
-            >
-           
+         <form id="loginForm" >
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input 
+          type="email" 
+          class="form-control" 
+          id="email" 
+          name="email" 
+          required
+        >
       </div>
 
       <div class="mb-3">
@@ -44,11 +48,11 @@
       ¿No tenés cuenta? 
       <a href="{{ url_for('auth.register') }}" style="color: #ff4d4d">Registrarse</a>
     </p>
-     </div>
- 
+  </div>
 </div>
-{% endblock %}
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
+{% endblock %}
 
 <!-- # testing
 detectar errores

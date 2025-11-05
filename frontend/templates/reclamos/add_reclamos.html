@@ -1,57 +1,266 @@
-<form
-  action="/avengers/new"
-  method="POST"
-  enctype="multipart/form-data"
-  class="card bg-black text-light"
->
-  <div class="card-body p-4">
-    <h1 class="h5 mb-4">Agregar Vengadores</h1>
+{% extends "layout.html" %}
 
-    <div class="mb-3">
-      <label for="nombre">Nombre:</label>
-      <input
-        type="text"
-        name="nombre"
-        class="form-control rounded-0 bg-dark border-0 text-white"
-        placeholder="Avenger Name"
-        autofocus
-      />
+{% block title %}Crear Reclamo{% endblock %}
+
+{% block body %}
+
+<div class="container my-5">
+  <h2 class="text-center mb-4">Nuevo Reclamo</h2>
+<form id="reclamoForm">
+
+<div class="mb-4 text-center">
+  <label class="form-label fw-bold d-block mb-3 fs-5">Categoría del problema</label>
+
+  <div id="categorias" class="d-flex justify-content-center flex-wrap gap-4">
+    <div class="categoria-card" data-value="alumbrado">
+      <img src="{{ url_for('static', filename='images/focus.png') }}" alt="Alumbrado" width="70">
+      <p>Alumbrado</p>
     </div>
 
-    <div class="mb-3">
-      <label for="alias">Alias:</label>
-      <input
-        type="text"
-        name="alias"
-        class="form-control rounded-0 bg-dark border-0 text-white"
-        placeholder="Alias"
-        required
-      />
+    <div class="categoria-card" data-value="residuos">
+      <img src="{{ url_for('static', filename='images/trash.png') }}" alt="Residuos" width="70">
+      <p>Residuos</p>
     </div>
 
-    <div class="mb-3">
-      <label for="habilidades">Habilidades:</label>
-      <input
-        type="text"
-        name="habilidades"
-        class="form-control rounded-0 bg-dark border-0 text-white"
-        placeholder="Stock"
-      />
+    <div class="categoria-card" data-value="baches">
+      <img src="{{ url_for('static', filename='images/dump.png') }}" alt="Baches" width="70">
+      <p>Baches</p>
     </div>
 
-    <div class="mb-3">
-      <label for="actor">Actor:</label>
-      <textarea
-        name="actor"
-        rows="3"
-        class="form-control bg-dark text-white rounded-0"
-        required
-      ></textarea>
+    <div class="categoria-card" data-value="agua">
+      <img src="{{ url_for('static', filename='images/water-drop.png') }}" alt="Agua" width="70">
+      <p>Agua</p>
     </div>
 
+    <div class="categoria-card" data-value="arboles">
+      <img src="{{ url_for('static', filename='images/tree.png') }}" alt="Árboles" width="70">
+      <p>Árboles</p>
+    </div>
 
-
-
-    <button class="btn btn-primary">Save</button>
+    <div class="categoria-card" data-value="seguridad">
+      <img src="{{ url_for('static', filename='images/alarm.png') }}" alt="Seguridad" width="70">
+      <p>Seguridad</p>
+    </div>
   </div>
+
+  <!-- Campo oculto que se enviará al backend -->
+  <input type="hidden" name="categoria" id="categoriaSeleccionada" required>
+</div>
+
+<!-- === Estilos === -->
+<style>
+  .categoria-card {
+    cursor: pointer;
+    border: 2px solid #ccc;
+    border-radius: 15px;
+    padding: 15px 20px;
+    width: 110px;
+    text-align: center;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background-color: #fff;
+  }
+
+  .categoria-card:hover {
+    transform: scale(1.05);
+    border-color: #0dcaf0;
+  }
+
+  .categoria-card.selected {
+    border-color: #0dcaf0;
+    background-color: #e0f7fa;
+    box-shadow: 0 0 10px rgba(13,202,240,0.4);
+  }
+
+  .categoria-card img {
+    display: block;
+    margin: 0 auto 8px;
+  }
+</style>
+
+<!-- === Script para seleccionar categoría === -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const categorias = document.querySelectorAll(".categoria-card");
+  const inputCategoria = document.getElementById("categoriaSeleccionada");
+
+  categorias.forEach(card => {
+    card.addEventListener("click", () => {
+      // Quita selección previa
+      categorias.forEach(c => c.classList.remove("selected"));
+      // Marca la nueva
+      card.classList.add("selected");
+      // Guarda valor en el input oculto
+      inputCategoria.value = card.getAttribute("data-value");
+    });
+  });
+});
+</script>
+
+  <!-- Dirección -->
+  <div class="mb-4">
+    <label class="form-label fw-bold">Dirección del problema</label>
+    <input type="text" name="direccion" class="form-control" placeholder="Ej: San Martín 1234, Mendoza" required>
+  </div>
+
+  <!-- Mapa -->
+  <div class="mb-4">
+    <label class="form-label fw-bold">Mapa interactivo</label>
+    <div id="map" style="height: 300px; border-radius: 10px; border: 2px solid #0dcaf0;"></div>
+    <input type="hidden" id="lat" name="lat">
+    <input type="hidden" id="lng" name="lng">
+  </div>
+
+  <!-- Foto -->
+  <div class="mb-4">
+    <label class="form-label fw-bold">Foto del problema</label>
+    <div class="border border-info border-2 rounded p-4 text-center" style="cursor:pointer;">
+      <input type="file" id="fotoInput" name="foto" accept="image/*" class="form-control" style="display:none;">
+      <img id="fotoPreview" src="" alt="Vista previa" class="img-fluid rounded d-none mt-2" style="max-height:200px;">
+      <div id="fotoPlaceholder">
+        <i class="bi bi-camera fs-1 text-info"></i>
+        <p>Tocá para tomar o subir una foto</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Descripción -->
+  <div class="mb-4">
+    <label class="form-label fw-bold">Descripción del problema</label>
+    <textarea name="descripcion" class="form-control" rows="4" placeholder="Describí el problema con el mayor detalle posible..." required></textarea>
+  </div>
+
+  <!-- Botón Enviar -->
+  <div class="text-center">
+    <button type="submit" class="btn btn-danger btn-lg px-5">Enviar Reclamo</button>
+  </div>
+</div>
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // mapa
+  const map = L.map('map').setView([-32.8895, -68.8458], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(map);
+
+  let marker;
+
+  map.on('click', function(e) {
+    const { lat, lng } = e.latlng;
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lng]).addTo(map)
+      .bindPopup(`📍 Ubicación seleccionada:<br>Lat: ${lat.toFixed(5)}<br>Lng: ${lng.toFixed(5)}`)
+      .openPopup();
+
+    document.getElementById('lat').value = lat;
+    document.getElementById('lng').value = lng;
+  });
+
+  // foto
+  const fotoInput = document.getElementById("fotoInput");
+  const fotoPlaceholder = document.getElementById("fotoPlaceholder");
+  const fotoPreview = document.getElementById("fotoPreview");
+
+  fotoPlaceholder.addEventListener("click", () => fotoInput.click());
+
+  fotoInput.addEventListener("change", function() {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        fotoPreview.src = e.target.result;
+        fotoPreview.classList.remove("d-none");
+        fotoPlaceholder.style.display = "none";
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+});
+</script>
+
+
+
+
+
+<!-- Script del envío -->
+<script>
+document.getElementById("reclamoForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+   // 🔹 Verificar autenticación
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Debe iniciar sesión para crear un reclamo.");
+    window.location.href = "/login";
+    return;
+  }
+
+  const categoria = document.getElementById("categoriaSeleccionada").value;
+  const direccion = document.querySelector("input[name='direccion']").value;
+  const descripcion = document.querySelector("textarea[name='descripcion']").value;
+  const lat = document.getElementById("lat").value;
+  const lng = document.getElementById("lng").value;
+  const fotoInput = document.getElementById("fotoInput").files[0];
+
+  let fotoBase64 = null;
+  if (fotoInput) {
+    const reader = new FileReader();
+    fotoBase64 = await new Promise((resolve) => {
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(fotoInput);
+    });
+  }
+
+  const data = { categoria, direccion, descripcion, lat, lng, foto: fotoBase64 };
+
+  try {
+    const response = await fetch("{{ url_for('reclamo_bp.crear_reclamo') }}", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" ,
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(data)
+  
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      // Mostrar modal Bootstrap
+      const modal = new bootstrap.Modal(document.getElementById("reclamoExitosoModal"));
+      modal.show();
+
+      // Redirigir al dashboard después de cerrar el modal
+      const aceptarBtn = document.getElementById("btnAceptarModal");
+      aceptarBtn.addEventListener("click", () => {
+        window.location.href = "/dashboard";
+      });
+    } else {
+      alert("❌ Error: " + (result.message || "No se pudo crear el reclamo"));
+    }
+  } catch (error) {
+    alert("⚠️ Error del servidor. Intente nuevamente.");
+  }
+});
+</script>
+
+<!-- ✅ Modal de confirmación -->
+<div class="modal fade" id="reclamoExitosoModal" tabindex="-1" aria-labelledby="reclamoExitosoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center p-3">
+      <div class="modal-body">
+        <h4 class="text-success mb-3">✅ Reclamo enviado con éxito</h4>
+        <p>Gracias por informar el problema. Tu reclamo será revisado por el municipio.</p>
+        <button id="btnAceptarModal" type="button" class="btn btn-primary mt-2" data-bs-dismiss="modal">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </form>
+{% endblock %}

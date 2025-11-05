@@ -5,3 +5,19 @@
   width: 180px;  
   height: auto;  
 }
+
+@media (max-width: 768px) {
+  .logo-reclamo {
+    width: 140px; /* un poco más chico para no tapar nada */
+    right: 20px;  /* margen más angosto */
+    top: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-reclamo {
+    width: 110px; /* versión móvil */
+    right: 15px;
+    top: 10px;
+  }
+}

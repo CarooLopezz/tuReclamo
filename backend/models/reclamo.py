@@ -6,6 +6,8 @@ class Reclamo(db.Model):
     __tablename__ = "reclamo"
 
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    categoria = db.Column(db.String(100)) 
+    direccion = db.Column(db.String(200), nullable=False)
     descripcion = db.Column(db.String(500), nullable=False)
     estado = db.Column(db.String(50), default="pendiente")
     fecha_creacion = db.Column(db.DateTime, default=datetime.now)
@@ -21,6 +23,8 @@ class Reclamo(db.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "categoria":self.categoria ,
+            "direccion":self.direccion,
             "descripcion": self.descripcion,
             "estado": self.estado,
             "fecha_creacion": self.fecha_creacion.isoformat(),
