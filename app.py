@@ -1,6 +1,6 @@
 import os
 import jwt
-from flask import Flask, render_template
+from flask import Flask, render_template,send_from_directory
 from backend.config.config import DATABASE_CONNECTION_URI
 from backend.models.db import db
 from backend.models.user import User
@@ -18,8 +18,10 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 
 load_dotenv()  # carga las variables del .env
-
 app = Flask(__name__, template_folder='frontend/templates', static_folder="frontend/static")
+
+
+
 CORS(app, supports_credentials=True)
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_CONNECTION_URI
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -71,6 +73,11 @@ with app.app_context():
         print("✔️ Todos los directores de sector fueron cargados.")
 
 
+
+    @app.route('/images/images_reclamo/<filename>')
+    def serve_reclamo_image(filename):
+        image_dir = os.path.join(os.getcwd(), 'images', 'images_reclamo')
+        return send_from_directory(image_dir, filename)
 
 if __name__ == "__main__":
     app.run(debug=True)

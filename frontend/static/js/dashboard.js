@@ -1,61 +1,46 @@
-console.log("Dashboard cargado correctamente.");
-
-async function cargarReclamos() {
+document.addEventListener("DOMContentLoaded", async () => {
   try {
     const response = await fetch("/api/reclamos");
     const reclamos = await response.json();
 
-    const container = document.getElementById("reclamosComunidad");
-    if (!container) {
-      console.error("No se encontró el contenedor de reclamos");
-      return;
-    }
+    const contenedor = document.getElementById("reclamosComunidad");
+    contenedor.innerHTML = "";
 
-    container.innerHTML = "";
+    reclamos.forEach((reclamo) => {
+      // Si hay imagen, usar su ruta; si no, usar una por defecto
+      const fotoUrl = reclamo.foto
+        ? `/${reclamo.foto}`  // 👈 asegurate de poner el slash inicial
+        : "/static/images/tureclamo.png"; // imagen default
 
-    reclamos.forEach(r => {
       const card = document.createElement("div");
       card.classList.add("reclamo-card");
 
-      // Imagen por defecto
-      let fotoSrc = "/static/images/tureclamo.png";
-
-      if (r.foto) {
-        if (r.foto.startsWith("data:image")) {
-          // viene en base64 completa
-          fotoSrc = r.foto;
-        } else if (r.foto.startsWith("/static/")) {
-          // imagen guardada en static
-          fotoSrc = r.foto;
-        } else if (r.foto.startsWith("images/")) {
-          // si se guardó en carpeta
-          fotoSrc = `/${r.foto}`;
-        } else if (r.foto.match(/\.(png|jpg|jpeg)$/)) {
-          // si solo vino el nombre de la imagen
-          fotoSrc = `/static/images/${r.foto}`;
-        } else {
-          // si vino base64 sin prefijo
-          fotoSrc = `data:image/jpeg;base64,${r.foto}`;
-        }
-      }
-
-      // Crear card
       card.innerHTML = `
-        <img src="${fotoSrc}" alt="Imagen del reclamo" onerror="this.src='/static/images/tureclamo.png'">
+        <img src="${fotoUrl}" alt="Imagen del reclamo" class="reclamo-foto">
         <div class="reclamo-info">
-          <h3>${r.categoria || "Sin categoría"}</h3>
-          <p><strong>Dirección:</strong> ${r.direccion || "No especificada"}</p>
-          <p>${r.descripcion || ""}</p>
+          <h3>${reclamo.categoria}</h3>
+          <p><strong>Dirección:</strong> ${reclamo.direccion}</p>
+          <p>${reclamo.descripcion}</p>
+          <p class="usuario">Reportado por: ${reclamo.usuario}</p>
+          <button class="btn-borrar" data-id="${reclamo.id}">🗑️ Borrar</button>
         </div>
       `;
 
-      container.appendChild(card);
+      contenedor.appendChild(card);
     });
-  } catch (err) {
-    console.error("Error al cargar los reclamos:", err);
-    const container = document.getElementById("reclamosComunidad");
-    if (container) container.innerHTML = `<p>Error al cargar los reclamos.</p>`;
+  } catch (error) {
+    console.error("Error cargando reclamos:", error);
   }
-}
+});
 
-document.addEventListener("DOMContentLoaded", cargarReclamos);
+contenedor.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("btn-borrar")) {
+    const id = e.target.getAttribute("data-id");
+
+    // Opcional: borrar del servidor también
+    await fetch(`/api/reclamos/${id}`, { method: "DELETE" });
+
+    // Borrar visualmente del DOM
+    e.target.closest(".reclamo-card").remove();
+  }
+});

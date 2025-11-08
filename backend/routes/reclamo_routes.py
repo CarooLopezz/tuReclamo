@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify,render_template,session,app, current_app
+from flask import Blueprint, request, jsonify,render_template,session,app, current_app,send_from_directory
 from backend.models.db import db
 from backend.models.reclamo import Reclamo
 from backend.models.UserTypemodels import UserType
@@ -8,17 +8,31 @@ import uuid
 import jwt
 import os
 from werkzeug.utils import secure_filename
-import base64
+
 
 
 reclamo_bp = Blueprint('reclamo_bp', __name__)
 
-@reclamo_bp.route("/crear-reclamo", methods=[ "GET","POST"])
+@reclamo_bp.route('/uploads/<filename>')
+def uploaded_file(filename):
+    uploads_dir = os.path.join(os.path.dirname(__file__), '..', 'static', 'images')
+    return send_from_directory(uploads_dir, filename)
 
+# Extensiones permitidas
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    """Verifica si la extensión del archivo es válida"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+# --------------------- CREAR RECLAMO ---------------------
+@reclamo_bp.route("/crear-reclamo", methods=["GET", "POST"])
 def crear_reclamo():
     if request.method == "GET":
         return render_template("reclamos/add_reclamos.html")
 
+    # Verificación del token
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         return jsonify({"message": "No hay token de autorización"}), 401
@@ -32,44 +46,65 @@ def crear_reclamo():
     except jwt.InvalidTokenError:
         return jsonify({"message": "Token inválido"}), 401
 
-    # 🔹 Obtener datos como JSON (no form)
-    data = request.get_json()
+    # Si la solicitud viene con archivos (FormData)
+    categoria = request.form.get("categoria")
+    direccion = request.form.get("direccion")
+    descripcion = request.form.get("descripcion")
 
-    categoria = data.get("categoria")
-    direccion = data.get("direccion")
-    descripcion = data.get("descripcion")
-    foto_base64 = data.get("foto")  # ⚠️ Esto llega del frontend en formato base64
-    
- 
+    foto = request.files.get("foto")
+    imagen_path = None  
 
-    # 🔹 Crear reclamo con imagen base64 directamente
+    if foto and foto.filename:
+        filename = secure_filename(f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{foto.filename}")
+
+        upload_folder = os.path.join("images", "images_reclamo")
+        os.makedirs(upload_folder, exist_ok=True)
+
+        foto_path = os.path.join(upload_folder, filename)
+        foto.save(foto_path)
+
+        # 👇 esta es la ruta que vas a guardar en la base de datos
+        imagen_path = f"images/images_reclamo/{filename}"
+    else:
+        imagen_path = None
+        #
+
+
+    # Crear el reclamo
     nuevo_reclamo = Reclamo(
         user_id=user_id,
         categoria=categoria,
         direccion=direccion,
         descripcion=descripcion,
-        foto=foto_base64  # 🔸 se guarda directamente en la base
+        foto=imagen_path  
     )
 
     db.session.add(nuevo_reclamo)
     db.session.commit()
 
     return jsonify({"message": "Reclamo creado correctamente"}), 201
-#poner debajo de la pagina
+
+
 @reclamo_bp.route("/api/reclamos", methods=["GET"])
 def obtener_reclamos():
-    reclamos = Reclamo.query.all()  # o .order_by(Reclamo.id.desc()) si querés últimos primero
+    reclamos = Reclamo.query.all()
     reclamos_data = []
 
     for r in reclamos:
-        print("📸 FOTO:", r.foto[:100] if r.foto else "SIN FOTO") 
+        if r.foto:
+    # foto guarda algo como "images/20251108131044_residuos.jpeg"
+            filename = os.path.basename(r.foto)
+            foto_url = f"images/images_reclamo/{filename}"
+        else:
+            foto_url = None
+
         reclamos_data.append({
             "id": r.id,
             "categoria": r.categoria,
             "direccion": r.direccion,
             "descripcion": r.descripcion,
-            "foto": r.foto if r.foto else "/static/images/tureclamo.png",
-            "usuario": getattr(r.user, "username", "Anónimo")  # <-- así evitás crash
+            "foto": foto_url,
+            "usuario": getattr(r.user, "username", "Anónimo")
         })
 
     return jsonify(reclamos_data)
@@ -100,7 +135,9 @@ def cambiar_estado(id):
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': f'Error al actualizar estado: {str(e)}'}), 500    
+        return jsonify({'error': f'Error al actualizar estado: {str(e)}'}), 500  
+      
+@reclamo_bp.route("/api/reclamos/<int:id>", methods=["DELETE"])   
 
 def eliminar_reclamo(id):
     reclamo = Reclamo.query.get(id)

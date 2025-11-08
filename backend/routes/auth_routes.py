@@ -9,6 +9,8 @@ import jwt
 from flask import current_app as app
 from functools import wraps
 from datetime import datetime, timedelta
+from flask_login import current_user
+
 
 auth_bp = Blueprint("auth", __name__,  template_folder='templates' )
 # -------------------- DECORADOR PARA TOKEN --------------------
@@ -53,18 +55,22 @@ def register():
             username = data.get("username")
             email = data.get("email")
             password = data.get("password")
-
+            role = data.get("role")
     
-            vecino_tipo = UserType.query.filter_by(tipo="vecino").first()
-            if not vecino_tipo:
-                return jsonify({"error": "El tipo 'vecino' no existe. Cargalo con init_user_types.py"}), 400
+            if not all([username, email, password, role]):
+                return jsonify({"message": "Todos los campos son obligatorios"}), 400
+
+            # Verificar si el email ya existe
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user:
+                return jsonify({"message": "El email ya está registrado"}), 400
 
             hashed_password = generate_password_hash(password)
             nuevo_user = User(
                 username=username,
                 email=email,
                 password=hashed_password,
-                role="user",
+                role=role,
                 user_type_id=vecino_tipo.id
             )
 
@@ -91,7 +97,7 @@ def login():
 
         email = data.get("email")
         password = data.get("password")
-
+        role = data.get("role")
         user = User.query.filter_by(email=email).first()
         if not user or not check_password_hash(user.password, password):
             return jsonify({"message": "Email o contraseña incorrectos"}), 401
@@ -112,16 +118,47 @@ def login():
 
     return render_template("auth/login.html")
 
-# -------------------- DASHBOARD --------------------
-@auth_bp.route("/dashboard") # solo los usuarios autenticados pueden entrar al dashboard
+
+# -------------------- DASHBOARD VECINO --------------------
+
+""" @auth_bp.route("/dashboard", methods=["GET"])
+def dashboard():
+    auth_header = request.headers.get("Authorization") 
+
+    if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({"message": "No hay token"}), 401
+
+    token = auth_header.split(" ")[1] 
+
+    try: 
+        decoded = jwt.decode( app.config["SECRET_KEY"], algorithms=["HS256"])
+        user = User.query.get(decoded["id"])
+
+        if not user:
+                return jsonify({"message": "Usuario no encontrado"}), 404
+
+        if user.role == "director":
+                return render_template("directorSector/directorSector.html", user=user)
+        else:
+                return render_template("dashboard/dashboard.html", user=user)
+
+    except jwt.ExpiredSignatureError:
+            return jsonify({"message": "Token expirado"}), 401
+    except jwt.InvalidTokenError:
+            return jsonify({"message": "Token inválido"}), 401  """
+@auth_bp.route("/dashboard")
 def dashboard():
     return render_template("dashboard/dashboard.html")
-""" 
-@dashboard_bp.route("/dashboard")
+
+@auth_bp.route("/directorSector")
+def director_sector_panel():
+    return render_template("directorSector/directorSector.html")
+
+""" @dashboard_bp.route("/dashboard")
 @login_required
 def dashboard():
     reclamos = Reclamo.query.order_by(Reclamo.id.desc()).all()
-    return render_template("dashboard.html", reclamos=reclamos)
+    return render_template("dashboard.html", reclamos=reclamos) 
 # -------------------- LOGOUT -------------------- cierra sesión
 @auth_bp.route("/logout")
 def logout():

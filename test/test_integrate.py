@@ -20,7 +20,7 @@ def client():
     with app.app_context():
         db.create_all()
         # Insertar datos de prueba
-        user = User(username="pietro", email="pietro@example.com", password="123" )
+        user = User(username="caro", email="caroolinalopez4@gmail.com", password="123" )
         db.session.add(user)
         db.session.commit()
 
@@ -37,4 +37,4 @@ def test_get_users(client):
     """Prueba que el endpoint /users devuelva correctamente el usuario de prueba"""
     response = client.get('/users/')
     assert response.status_code == 200
-    assert b"pietro" in response.data
+    assert b"caro" in response.data

@@ -190,7 +190,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <script>
 document.getElementById("reclamoForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-   // 🔹 Verificar autenticación
+
+  // 🔹 Verificar autenticación
   const token = localStorage.getItem("token");
   if (!token) {
     alert("Debe iniciar sesión para crear un reclamo.");
@@ -198,38 +199,39 @@ document.getElementById("reclamoForm").addEventListener("submit", async (e) => {
     return;
   }
 
+  // 🔹 Obtener los valores del formulario
   const categoria = document.getElementById("categoriaSeleccionada").value;
   const direccion = document.querySelector("input[name='direccion']").value;
   const descripcion = document.querySelector("textarea[name='descripcion']").value;
-  const lat = document.getElementById("lat").value;
-  const lng = document.getElementById("lng").value;
+  const lat = document.getElementById("lat")?.value || "";
+  const lng = document.getElementById("lng")?.value || "";
   const fotoInput = document.getElementById("fotoInput").files[0];
 
-  let fotoBase64 = null;
-  if (fotoInput) {
-    const reader = new FileReader();
-    fotoBase64 = await new Promise((resolve) => {
-      reader.onload = () => resolve(reader.result);
-      reader.readAsDataURL(fotoInput);
-    });
-  }
+  // 🔹 Crear FormData
+  const formData = new FormData();
+  formData.append("categoria", categoria);
+  formData.append("direccion", direccion);
+  formData.append("descripcion", descripcion);
+  formData.append("lat", lat);
+  formData.append("lng", lng);
 
-  const data = { categoria, direccion, descripcion, lat, lng, foto: fotoBase64 };
+  if (fotoInput) {
+    formData.append("foto", fotoInput);
+  }
 
   try {
     const response = await fetch("{{ url_for('reclamo_bp.crear_reclamo') }}", {
       method: "POST",
-      headers: { "Content-Type": "application/json" ,
-        "Authorization": `Bearer ${token}`
+      headers: {
+        "Authorization": `Bearer ${token}` // ❗ No poner Content-Type con FormData
       },
-      body: JSON.stringify(data)
-  
+      body: formData
     });
 
     const result = await response.json();
 
     if (response.ok) {
-      // Mostrar modal Bootstrap
+      // Mostrar modal Bootstrap de éxito
       const modal = new bootstrap.Modal(document.getElementById("reclamoExitosoModal"));
       modal.show();
 
@@ -243,9 +245,11 @@ document.getElementById("reclamoForm").addEventListener("submit", async (e) => {
     }
   } catch (error) {
     alert("⚠️ Error del servidor. Intente nuevamente.");
+    console.error(error);
   }
 });
 </script>
+
 
 <!-- ✅ Modal de confirmación -->
 <div class="modal fade" id="reclamoExitosoModal" tabindex="-1" aria-labelledby="reclamoExitosoModalLabel" aria-hidden="true">
