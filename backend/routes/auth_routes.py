@@ -42,9 +42,8 @@ def token_required(role=None):
             return f(current_user, *args, **kwargs)
         return decorated
     return decorator
+#---------------------REGISTER-------------------------
 
-
-# -------------------- REGISTER --------------------
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -56,7 +55,7 @@ def register():
             email = data.get("email")
             password = data.get("password")
             role = data.get("role")
-    
+
             if not all([username, email, password, role]):
                 return jsonify({"message": "Todos los campos son obligatorios"}), 400
 
@@ -65,21 +64,35 @@ def register():
             if existing_user:
                 return jsonify({"message": "El email ya está registrado"}), 400
 
+            # Encriptar la contraseña
             hashed_password = generate_password_hash(password)
+
+            # 🔸 Asignar tipo de usuario según el rol elegido
+            if role.lower() == "director":
+                tipo = UserType.query.filter_by(nombre="Director").first()
+            else:
+                tipo = UserType.query.filter_by(nombre="Vecino").first()
+
+            if not tipo:
+                return jsonify({"message": "Tipo de usuario no configurado"}), 500
+
             nuevo_user = User(
                 username=username,
                 email=email,
                 password=hashed_password,
                 role=role,
-                user_type_id=vecino_tipo.id
+                user_type_id=tipo.id
             )
 
             db.session.add(nuevo_user)
             db.session.commit()
+
             return jsonify({"message": "Usuario registrado correctamente"}), 201
+
         except Exception as e:
             print("ERROR EN /register:", e)
             return jsonify({"error": str(e)}), 500
+
     return render_template("auth/register.html")
 
 # -------------------- LOGIN --------------------
@@ -97,8 +110,9 @@ def login():
 
         email = data.get("email")
         password = data.get("password")
-        role = data.get("role")
+
         user = User.query.filter_by(email=email).first()
+
         if not user or not check_password_hash(user.password, password):
             return jsonify({"message": "Email o contraseña incorrectos"}), 401
 
@@ -107,17 +121,22 @@ def login():
             app.config["SECRET_KEY"],
             algorithm="HS256"
         )
-        
+
+        # 🔥 Redirección según rol
+        if user.role == "Director":
+            redirect_url = "/dashboard"
+        else:
+            redirect_url = "/dashboardSector"
 
         return jsonify({
             "message": "Login exitoso",
             "token": token,
             "role": user.role,
-            "username": user.username
+            "username": user.username,
+            "redirect": redirect_url
         }), 200
 
     return render_template("auth/login.html")
-
 
 # -------------------- DASHBOARD VECINO --------------------
 
@@ -150,9 +169,6 @@ def dashboard():
 def dashboard():
     return render_template("dashboard/dashboard.html")
 
-@auth_bp.route("/directorSector")
-def director_sector_panel():
-    return render_template("directorSector/directorSector.html")
 
 """ @dashboard_bp.route("/dashboard")
 @login_required

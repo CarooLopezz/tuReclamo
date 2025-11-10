@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <p><strong>Dirección:</strong> ${reclamo.direccion}</p>
           <p>${reclamo.descripcion}</p>
           <p class="usuario">Reportado por: ${reclamo.usuario}</p>
-          <button class="btn-borrar" data-id="${reclamo.id}">🗑️ Borrar</button>
+         
         </div>
       `;
 
@@ -33,14 +33,38 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-contenedor.addEventListener("click", async (e) => {
-  if (e.target.classList.contains("btn-borrar")) {
-    const id = e.target.getAttribute("data-id");
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+        email: form.email.value,
+        password: form.password.value
+    };
+    console.log("Datos enviados:", data);
+    const res = await fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    console.log(result);
 
-    // Opcional: borrar del servidor también
-    await fetch(`/api/reclamos/${id}`, { method: "DELETE" });
-
-    // Borrar visualmente del DOM
-    e.target.closest(".reclamo-card").remove();
-  }
+    if (res.ok) {
+        localStorage.setItem("token", result.token);
+        localStorage.setItem("role", result.role);
+        localStorage.setItem("username", result.username);
+        window.location.href = "/dashboard";
+    } else {
+        alert(result.message);
+    }
 });
+
+
+
+async function borrar(id) {
+  await fetch(`/api/reclamos/borrar/${id}`, { 
+      method: "DELETE",
+      headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+  });
+  location.reload();
+}

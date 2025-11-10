@@ -16,11 +16,19 @@ from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash
 from dotenv import load_dotenv
 from flask_cors import CORS
-
+from flask_mail import Mail
 load_dotenv()  # carga las variables del .env
 app = Flask(__name__, template_folder='frontend/templates', static_folder="frontend/static")
 
+# Configuración de Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'tuemail@gmail.com'
+app.config['MAIL_PASSWORD'] = 'tu_clave_de_aplicacion'
+app.config['MAIL_DEFAULT_SENDER'] = 'tuemail@gmail.com'
 
+mail = Mail(app)
 
 CORS(app, supports_credentials=True)
 app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_CONNECTION_URI

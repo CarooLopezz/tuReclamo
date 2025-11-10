@@ -109,7 +109,15 @@ def obtener_reclamos():
 
     return jsonify(reclamos_data)
 
+@reclamo_bp.route("/api/reclamos/borrar/<int:id>", methods=["DELETE"])
+def borrar_reclamo_dashboard(id):
+    reclamo = Reclamo.query.get(id)
+    if not reclamo:
+        return jsonify({"error": "Reclamo no encontrado"}), 404
 
+    db.session.delete(reclamo)
+    db.session.commit()
+    return jsonify({"message": "Reclamo eliminado correctamente"}), 200
 # -------- LISTAR TODOS LOS RECLAMOS --------
 @reclamo_bp.route('/reclamos', methods=['GET'])
 def listar_reclamos():

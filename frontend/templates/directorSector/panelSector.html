@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}Panel del Director{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+  <h2 class="text-center mb-4">Panel de Reclamos</h2>
+
+  <table class="table table-bordered table-hover text-center align-middle" id="tablaReclamos">
+    <thead class="table-primary">
+      <tr>
+        <th>Username</th>
+        <th>Categoría</th>
+        <th>Dirección</th>
+        <th>Foto</th>
+        <th>Descripción</th>
+        <th style="width: 160px;text-align: center";>Estado</th>
+        <th>Notificar</th>
+        <th>Borrar</th>
+      </tr>
+    </thead>
+    <tbody id="tbodyReclamos"></tbody>
+  </table>
+</div> 
+<script src="{{ url_for('static', filename='js/panelSector.js') }}"></script>
+
+{% endblock %}
